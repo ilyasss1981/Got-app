@@ -8,23 +8,17 @@ export default class GotService {
     
       if (!res.ok) {
         throw new Error(`Could not fetch ${url}, status: ${res.status}`)
-      }
-  
+      }  
       return await res.json()
     }
   
     async getAllCharacters() {
-        const res =await this.getResource('/characters?page=5&pageSize=10')
+        const res =await this.getResource('/characters?page=5&pageSize=10')        
         return res.map(this._transformCharacter)
     }
   
     async getCharacter(id) {
-      const character = await this.getResource(`/characters/${id}`)      
-      for (let key in character) {
-        if (character[key] === '') {
-            character[key] = '-----'
-        }
-      }      
+      const character = await this.getResource(`/characters/${id}`)              
       return this._transformCharacter(character)
     }
 
@@ -44,13 +38,28 @@ export default class GotService {
         return this.getResource(`/books/${id}`)
     }
 
-    _transformCharacter(char) {
+    isSet(data) {
+        if (data) {
+            return data
+        } else {
+            return 'no data :('
+        }
+    }
+
+    _extractId = (item) => {
+        const idRegExp = /\/([0-9]*)$/;
+        return item.url.match(idRegExp)[1];
+    }
+
+
+    _transformCharacter = (char) => {
         return {
-            name: char.name,
-            gender: char.gender,
-            born: char.born,
-            died: char.died,
-            culture: char.culture
+            id: this._extractId(char),
+            name: this.isSet(char.name),
+            gender: this.isSet(char.gender),
+            born: this.isSet(char.born),
+            died: this.isSet(char.died),
+            culture: this.isSet(char.culture)
         }
     }
 
@@ -64,7 +73,7 @@ export default class GotService {
             ancestralWeapons: house.ancestralWeapons
         }
     }
-
+    
     _transformBook(book) {
         return {
             name: book.name,

@@ -3,11 +3,17 @@ import {Col, Row, Container} from 'reactstrap';
 import Header from '../header';
 import RandomChar from '../randomChar';
 import ErrorMessage from '../errorMessage'
-import CharacterPage from '../characterPage'
+import {CharacterPage, HousePage, BookPage} from '../pages'
+
+
+import GotService from '../../services/gotService'
+
 import './app.css'
 
 
 export default class App extends Component {
+    gotService = new GotService()
+
     state = {
         showRandomChar: true,
         error: false        
@@ -49,7 +55,9 @@ export default class App extends Component {
                                 onClick={this.toggleRandomChar}>Toggle random character</button>
                         </Col>
                     </Row>
-                    <CharacterPage/>                    
+                    <CharacterPage/>   
+                    <HousePage/>
+                    <BookPage/>
                 </Container>
             </>
         );

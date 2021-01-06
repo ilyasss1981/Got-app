@@ -1,17 +1,27 @@
 import React, {Component} from 'react';
 import Spinner from '../spinner';
+import PropTypes from 'prop-types'
 import './itemList.css';
 
-export default class ItemList extends Component {
-    
+
+export default class ItemList extends Component {  
 
     state = {
         itemList: null
     }
 
-    componentDidMount() {
-        const {getData} = this.props
+    //установка по умолчанию и проверка значений по новому
+    static defaultProps = {
+        onItemSelected: () => {}
+    }
+    
+    static propTypes = {
+        onItemSelected: PropTypes.func
+    }
 
+    componentDidMount() {  
+        const {getData} = this.props        
+    
         getData()
             .then( (itemList) => {
                 this.setState({
@@ -33,16 +43,15 @@ export default class ItemList extends Component {
                 </li>
             )
         })
-    }
-
+    } 
+    
     render() {
 
-        const {itemList} = this.state   
-        console.log(itemList)      
+        const {itemList} = this.state
 
         if (!itemList) {
             return <Spinner/>
-        }
+        }      
 
         const items = this.renderItems(itemList)
 
@@ -50,6 +59,6 @@ export default class ItemList extends Component {
             <ul className="item-list list-group">
                 {items}
             </ul>
-        );
+        )
     }
 }

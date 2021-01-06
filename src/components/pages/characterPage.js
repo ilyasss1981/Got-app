@@ -5,6 +5,8 @@ import ErrorMessage from '../errorMessage'
 import GotService from '../../services/gotService'
 import RowBlock from '../rowBlock'
 
+
+
 export default class CharacterPage extends Component {
     gotService = new GotService()
 
@@ -31,13 +33,12 @@ export default class CharacterPage extends Component {
             return <ErrorMessage/>
         }
 
-        const itemList = (
+        const itemList = (           
             <ItemList 
                 onItemSelected={this.onItemSelected}
                 getData={this.gotService.getAllCharacters}                
                 renderItem={({name, gender}) => `${name} (${gender})`}/>
-
-        )
+        )        
 
         const charDetails = (
             <ItemDetails 

@@ -1,6 +1,5 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import Spinner from '../spinner';
-import GotService from '../../services/gotService';
 import './itemDetails.css';
 
 const Field = ({item, field, label}) => {
@@ -14,66 +13,49 @@ const Field = ({item, field, label}) => {
 
 export {Field}
 
-export default class ItemDetails extends Component {
+function ItemDetails({itemId, getData, children}) {
 
-    gotService = new GotService()
+    //const gotService = new GotService()
 
-    state = {
-        item: null,
-        loading: true,
-        error: false
+    const [item, setItem] = useState([])
+    const [loading, setLoaing] = useState(true)
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        updateItem()
+    }, [itemId])
+    
+
+    const onItemDetailsLoaded = (item) => {
+        setItem(item)
+        setLoaing(false)        
     }
 
-    componentDidMount() {
-        this.updateItem()
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.itemId !== prevProps.itemId) {
-            this.updateItem()
-        }
-    }
-
-    onItemDetailsLoaded = (item) => {
-        this.setState({
-            item,
-            loading: false
-        })
-    }
-
-    updateItem() {
-        const {itemId, getData} = this.props
+    function updateItem() {        
 
         if (!itemId) {
             return
         }
 
-        this.setState({
-            loading: true
-        })
+        setLoaing(true)        
 
         getData(itemId)
-            .then(this.onItemDetailsLoaded)  
-            .catch(() => this.onError())        
+            .then(onItemDetailsLoaded)  
+            .catch(() => onError())        
     }
 
-    onError() {
-        this.setState({
-            item: null,
-            error: true
-        })
-    }
-
-    render() {
+    function onError() {
+        setItem([])
+        setError(true)        
+    }    
         
-        if (!this.state.item) {
+        if (!itemId) {
             return <span className='select-error'>Please select a character</span>            
         }
-
-        const {item} = this.state
+        
         const {name} = item
 
-        if (this.state.loading) {
+        if (loading) {
             return <Spinner/>
         }
         
@@ -82,12 +64,14 @@ export default class ItemDetails extends Component {
                 <h4>{name}</h4>
                 <ul className="list-group list-group-flush">
                     {
-                        React.Children.map(this.props.children, (child) => {
+                        React.Children.map(children, (child) => {
                             return React.cloneElement(child, {item})
                         })
                     }
                 </ul>
             </div>
         );
-    }
+    
 }
+
+export default ItemDetails

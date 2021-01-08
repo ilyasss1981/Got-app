@@ -1,59 +1,74 @@
-import React, {useState, useEffect} from 'react';
+import React, {Component} from 'react';
 import './randomChar.css';
 import GotService from '../../services/gotService';
 import Spinner from '../spinner';
 import ErrorMessage from '../errorMessage';
 import PropTypes from 'prop-types'
 
-function RandomChar({interval}) {
+export default class RandomChar extends Component {
 
-    const gotService = new GotService()
-    
-    const [char, setChar] = useState({})
-    const [loading, setLoaing] = useState(true)
-    const [error, setError] = useState(false)    
+    gotService = new GotService()
 
-    useEffect(() => {
-        updateChar()
-        let timerId = setInterval(() => updateChar, interval)
-        return () => {
-            clearInterval(timerId)
-        }
-    }, [])
-
-    const onCharLoaded = (char) => {
-        setChar(char)
-        setLoaing(false)
+    state = {
+        char: {},
+        loading: true,
+        error: false
     }
 
-    const onError = () => {
-        setError(true)
-        setLoaing(false)        
+    // новый вариант установки значений по умолчанию
+    // static defaultProps = {
+    //     interval: 1500
+    // }
+
+    componentDidMount() {
+        this.updateChar()
+        this.timerId = setInterval(this.updateChar, this.props.interval)
     }
+
+    componentWillUnmount() {
+        clearInterval(this.timerId)
+    }
+
+    onCharLoaded = (char) => {
+        this.setState({           
+            char,
+            loading: false            
+        })
+    }
+
+    onError = (error) => {
+        this.setState({
+            error: true,
+            loading: false
+        })
+    }
+
     
-    const updateChar = () => {        
+    updateChar = () => {        
         const id = Math.floor(Math.random()*140 + 25) //25-140                
-        gotService.getCharacter(id)
-            .then(onCharLoaded)
-            .catch(onError)
-    }         
+        this.gotService.getCharacter(id)
+            .then(this.onCharLoaded)
+            .catch(this.onError)
+    }
 
-    const errorMessage = error ? <ErrorMessage/> : null
-    const spinner = loading ? <Spinner/> : null
-    const content = !(loading || error) ? <View char={char}/> : null
-    
-    
-    return (
-        <div className="random-block rounded">  
-            {errorMessage}   
-            {spinner}           
-            {content}
-        </div>
-    )
-    
+    render() {      
+
+        const { char, loading, error } = this.state
+
+        const errorMessage = error ? <ErrorMessage/> : null
+        const spinner = loading ? <Spinner/> : null
+        const content = !(loading || error) ? <View char={char}/> : null
+        
+        
+        return (
+            <div className="random-block rounded">  
+                {errorMessage}   
+                {spinner}           
+                {content}
+            </div>
+        );
+    }
 }
-
-export default RandomChar
 
 RandomChar.defaultProps = {
     interval: 1500
